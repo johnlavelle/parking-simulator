@@ -1,0 +1,10 @@
+[project]
+name = "parking"
+version = "0.1.0"
+description = "Parking simulator for 29 Shore Road, Holywood"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "shapely",
+]
