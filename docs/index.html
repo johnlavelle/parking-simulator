@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Simulator - 29 Shore Road</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="sidebar">
+        <h2>29 Shore Road</h2>
+        <h3>Parking Simulator</h3>
+
+        <div class="control-group">
+            <label for="car-count">Number of Cars</label>
+            <input type="range" id="car-count" min="1" max="4" value="2" />
+            <span id="car-count-display">2</span>
+        </div>
+
+        <div class="control-group">
+            <label for="car-type">Car Type</label>
+            <select id="car-type">
+            </select>
+            <div id="row-width-info" class="info-text"></div>
+        </div>
+
+        <div class="button-group">
+            <button id="simulate-btn">Simulate Parking</button>
+            <button id="drive-out-btn" disabled>Drive Out</button>
+        </div>
+
+        <div id="warnings"></div>
+
+        <div id="legend">
+            <h4>Legend</h4>
+            <div class="legend-item">
+                <span class="legend-color" style="background:#808080"></span>
+                Building
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background:#4CAF50"></span>
+                Parking Area
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background:#FFC107"></span>
+                Right of Way
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background:#2196F3"></span>
+                Cars
+            </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="data.js"></script>
+    <script src="config.js"></script>
+    <script src="map.js"></script>
+    <script src="simulation.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
