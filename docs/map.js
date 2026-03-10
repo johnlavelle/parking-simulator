@@ -58,16 +58,115 @@ class ParkingMap {
         this.polygonLayers.addLayer(polygon);
     }
 
-    addCar(corners, color, label) {
-        const latlngs = corners.map(c => [c[1], c[0]]);
-        const polygon = L.polygon(latlngs, {
-            color: color || CONFIG.COLORS.carStroke,
-            fillColor: color || CONFIG.COLORS.car,
-            fillOpacity: 0.7,
-            weight: 2,
+    /** Convert [lon, lat] array to Leaflet [lat, lon] */
+    _toLatLng(coords) {
+        return coords.map(c => [c[1], c[0]]);
+    }
+
+    _darken(hex, amount) {
+        const num = parseInt(hex.replace('#', ''), 16);
+        const r = Math.max(0, (num >> 16) - amount);
+        const g = Math.max(0, ((num >> 8) & 0xFF) - amount);
+        const b = Math.max(0, (num & 0xFF) - amount);
+        return `rgb(${r},${g},${b})`;
+    }
+
+    /**
+     * Add a multi-layer car shape. `parts` has: body, cabin, windshield,
+     * rearWindow, headlightL, headlightR, taillightL, taillightR.
+     * Returns an object with named layer references for updateCar().
+     */
+    addCar(parts, color) {
+        const group = L.layerGroup();
+        const stroke = this._darken(color, 60);
+
+        const body = L.polygon(this._toLatLng(parts.body), {
+            color: stroke,
+            fillColor: color,
+            fillOpacity: 0.85,
+            weight: 1.5,
         });
-        this.carLayers.addLayer(polygon);
-        return polygon;
+        group.addLayer(body);
+
+        const cabin = L.polygon(this._toLatLng(parts.cabin), {
+            color: 'transparent',
+            fillColor: this._darken(color, 35),
+            fillOpacity: 0.6,
+            weight: 0,
+        });
+        group.addLayer(cabin);
+
+        const windshield = L.polygon(this._toLatLng(parts.windshield), {
+            color: 'rgba(180,220,255,0.4)',
+            fillColor: 'rgba(180,220,255,0.55)',
+            fillOpacity: 0.55,
+            weight: 0.5,
+        });
+        group.addLayer(windshield);
+
+        const rearWindow = L.polygon(this._toLatLng(parts.rearWindow), {
+            color: 'rgba(160,200,240,0.3)',
+            fillColor: 'rgba(160,200,240,0.45)',
+            fillOpacity: 0.45,
+            weight: 0.5,
+        });
+        group.addLayer(rearWindow);
+
+        const headlightL = L.polygon(this._toLatLng(parts.headlightL), {
+            color: 'transparent',
+            fillColor: '#FFFDE7',
+            fillOpacity: 0.9,
+            weight: 0,
+        });
+        group.addLayer(headlightL);
+
+        const headlightR = L.polygon(this._toLatLng(parts.headlightR), {
+            color: 'transparent',
+            fillColor: '#FFFDE7',
+            fillOpacity: 0.9,
+            weight: 0,
+        });
+        group.addLayer(headlightR);
+
+        const taillightL = L.polygon(this._toLatLng(parts.taillightL), {
+            color: 'transparent',
+            fillColor: '#D32F2F',
+            fillOpacity: 0.9,
+            weight: 0,
+        });
+        group.addLayer(taillightL);
+
+        const taillightR = L.polygon(this._toLatLng(parts.taillightR), {
+            color: 'transparent',
+            fillColor: '#D32F2F',
+            fillOpacity: 0.9,
+            weight: 0,
+        });
+        group.addLayer(taillightR);
+
+        this.carLayers.addLayer(group);
+
+        return {
+            group, body, cabin, windshield, rearWindow,
+            headlightL, headlightR, taillightL, taillightR,
+        };
+    }
+
+    /** Update all sub-layers of a car with new part coords. */
+    updateCar(layers, parts) {
+        layers.body.setLatLngs(this._toLatLng(parts.body));
+        layers.cabin.setLatLngs(this._toLatLng(parts.cabin));
+        layers.windshield.setLatLngs(this._toLatLng(parts.windshield));
+        layers.rearWindow.setLatLngs(this._toLatLng(parts.rearWindow));
+        layers.headlightL.setLatLngs(this._toLatLng(parts.headlightL));
+        layers.headlightR.setLatLngs(this._toLatLng(parts.headlightR));
+        layers.taillightL.setLatLngs(this._toLatLng(parts.taillightL));
+        layers.taillightR.setLatLngs(this._toLatLng(parts.taillightR));
+    }
+
+    /** Remove a car's layer group. */
+    removeCar(layers) {
+        this.carLayers.removeLayer(layers.group);
     }
 
     clearCars() {
